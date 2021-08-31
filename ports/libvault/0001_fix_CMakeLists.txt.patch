@@ -1,0 +1,62 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1be98f8..70d6c9f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,7 @@ option(LINK_CURL "Link curl library for vault" OFF)
+
+ find_package(CURL)
+ if (CURL_FOUND)
+-  include_directories(${CURL_INCLUDE_DIR})
++  include_directories(${CURL_INCLUDE_DIRS})
+ else (CURL_FOUND)
+   message(FATAL_ERROR "CURL not found")
+ endif (CURL_FOUND)
+@@ -118,20 +118,18 @@ set_target_properties(vault PROPERTIES
+
+ target_include_directories(vault PRIVATE src)
+
+-if(LINK_CURL)
+-  target_link_libraries(vault curl)
+-endif(LINK_CURL)
++target_link_libraries(vault PRIVATE CURL::libcurl)
+
+ if (ENABLE_COVERAGE)
+   target_link_libraries(vault gcov)
+ endif ()
+
+-if (UNIX)
++#if (UNIX)
+   install(TARGETS vault
+       EXPORT libvaultTargets
+       LIBRARY DESTINATION ${CMAKE_INSTALL_DIR}
+       PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libvault)
+-
++
+   install(EXPORT libvaultTargets
+     NAMESPACE libvault::
+     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libvault)
+@@ -141,14 +139,11 @@ if (UNIX)
+   configure_package_config_file(
+           ${CMAKE_CURRENT_SOURCE_DIR}/VaultConfig.cmake.in
+           ${CMAKE_CURRENT_BINARY_DIR}/libvaultConfig.cmake
+-          INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libvault
+-          PATH_VARS
+-          CMAKE_INSTALL_LIBDIR)
++          INSTALL_DESTINATION ${CURRENT_PACKAGES_DIR}/share/libvault)
+
+   write_basic_package_version_file(
+           ${CMAKE_CURRENT_BINARY_DIR}/libvaultConfigVersion.cmake
+           COMPATIBILITY SameMajorVersion)
+-
+   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libvaultConfig.cmake"
+           "${CMAKE_CURRENT_BINARY_DIR}/libvaultConfigVersion.cmake"
+           DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/libvault")
+@@ -156,7 +151,7 @@ if (UNIX)
+   configure_file(vault.pc.in vault.pc @ONLY)
+   install(FILES "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc"
+           DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+-endif (UNIX)
++#endif (UNIX)
+
+ if (ENABLE_TEST)
+   find_package(Catch2 REQUIRED)

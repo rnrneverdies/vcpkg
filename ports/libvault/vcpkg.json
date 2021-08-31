@@ -1,0 +1,8 @@
+{
+  "name": "libvault",
+  "version-string": "0.44.0",
+  "description": "HashiCorp Vault library for C++",
+  "dependencies": [
+    "curl"
+  ]
+}
